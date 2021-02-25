@@ -2,6 +2,7 @@ import feedparser
 import logging
 import sqlite3
 import os
+import pyyaml
 from telegram.ext import Updater, CommandHandler
 from pathlib import Path
 import message
@@ -26,6 +27,10 @@ else:
 if Token == "X":
     print("Token not set!")
 
+with open('config/config.yaml',encoding='utf-8')as f:
+    conf=yaml.load(f,Loader=yaml.SafeLoader)
+    print(conf)
+
 rss_dict = {}
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -33,17 +38,18 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 # logging.getLogger('apscheduler.executors.default').propagate = False  # to use this line, set log level to INFO
 
 
-# MANAGER
+# 检查是否有管理员权限
 def is_manager(update):
     chat = update.message.chat
     userid = str(chat.id)
     username = chat.username
-    if chat.last_name:
-        name = chat.first_name + ' ' + chat.last_name
-    else:
-        name = chat.first_name
+    # print(f'\n {chat} ', end='')
+    # if chat.last_name:
+    #     name = chat.first_name + ' ' + chat.last_name
+    # else:
+    #     name = chat.first_name
     command = update.message.text
-    print(f'\n{name} ({username}/{userid}) attempted to use "{command}", ', end='')
+    print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     if manager != userid:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
         print('forbade.')
@@ -61,7 +67,7 @@ def sqlite_connect():
 def sqlite_load_all():
     sqlite_connect()
     c = conn.cursor()
-    c.execute('SELECT * FROM rss')
+    c.execute('SELECT name,link,last FROM rss')
     rows = c.fetchall()
     conn.close()
     return rows
@@ -107,25 +113,28 @@ def cmd_rss_add(update, context):
     is_manager(update)
 
     # try if there are 2 arguments passed
+    feed_title=''
     try:
-        context.args[1]
+        context.args[0]
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /add 标题 RSS')
+            'ERROR: 格式需要为: /add RSS_URL')
         raise
     # try if the url is a valid RSS feed
     try:
         rss_d = feedparser.parse(context.args[1])
         rss_d.entries[0]['title']
+        feed_title= rss_d.feed.title
+         print(f'\n ({rss_d.feed.title}/{context.args[1]}) attempted to use , ', end='')
     except IndexError:
         update.effective_message.reply_text(
             'ERROR: 链接看起来不像是个 RSS 源，或该源不受支持')
         raise
-    sqlite_write(context.args[0], context.args[1],
+    sqlite_write(feed_title, context.args[1],
                  str(rss_d.entries[0]['link']))
     rss_load()
     update.effective_message.reply_text(
-        '已添加 \n标题: %s\nRSS 源: %s' % (context.args[0], context.args[1]))
+        '已添加 \n标题: %s\nRSS 源: %s' % (feed_title, context.args[1]))
 
 
 def cmd_rss_remove(update, context):
@@ -148,7 +157,7 @@ def cmd_help(update, context):
     is_manager(update)
 
     update.effective_message.reply_text(
-        f"""RSS to Telegram bot \\(Weibo Ver\\.\\)
+        f"""RSS to Telegram bot \\(Weibo Ver\\.\\4)
 \n成功添加一个 RSS 源后, 机器人就会开始检查订阅，每 {delay} 秒一次。 \\(可修改\\)
 \n标题为只是为管理 RSS 源而设的，可随意选取，但不可有空格。
 \n命令:
@@ -161,7 +170,7 @@ __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号�
         parse_mode='MarkdownV2'
     )
 
-
+#测试指定RSS源
 def cmd_test(update, context):
     is_manager(update)
 
@@ -174,6 +183,7 @@ def cmd_test(update, context):
         raise
     url = context.args[0]
     rss_d = feedparser.parse(url)
+
     if len(context.args) < 2 or len(rss_d.entries) <= int(context.args[1]):
         index = 0
     else:
@@ -221,7 +231,7 @@ def rss_monitor(context):
 def init_sqlite():
     conn = sqlite3.connect('config/rss.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE rss (name text, link text, last text)''')
+    c.execute('''CREATE TABLE rss (id INTEGER PRIMARY KEY AUTOINCREMENT,name text, link text, last text)''')
 
 
 def main():
