@@ -33,13 +33,16 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 # logging.getLogger('apscheduler.executors.default').propagate = False  # to use this line, set log level to INFO
 
 
-# MANAGER
+# 检查是否有管理员权限
 def is_manager(update):
     chat = update.message.chat
     userid = str(chat.id)
     username = chat.username
-    print(f'\n {chat} ', end='')
-
+    # print(f'\n {chat} ', end='')
+    # if chat.last_name:
+    #     name = chat.first_name + ' ' + chat.last_name
+    # else:
+    #     name = chat.first_name
     command = update.message.text
     print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     if manager != userid:
@@ -59,7 +62,7 @@ def sqlite_connect():
 def sqlite_load_all():
     sqlite_connect()
     c = conn.cursor()
-    c.execute('SELECT * FROM rss')
+    c.execute('SELECT name,link,last FROM rss')
     rows = c.fetchall()
     conn.close()
     return rows
@@ -105,6 +108,7 @@ def cmd_rss_add(update, context):
     is_manager(update)
 
     # try if there are 2 arguments passed
+    feed_title=''
     try:
         context.args[1]
     except IndexError:
@@ -115,6 +119,7 @@ def cmd_rss_add(update, context):
     try:
         rss_d = feedparser.parse(context.args[1])
         rss_d.entries[0]['title']
+        feed_title= rss_d.feed.title
     except IndexError:
         update.effective_message.reply_text(
             'ERROR: 链接看起来不像是个 RSS 源，或该源不受支持')
@@ -123,7 +128,7 @@ def cmd_rss_add(update, context):
                  str(rss_d.entries[0]['link']))
     rss_load()
     update.effective_message.reply_text(
-        '已添加 \n标题: %s\nRSS 源: %s' % (context.args[0], context.args[1]))
+        '已添加 \n标题: %s\nRSS 源: %s' % (feed_title, context.args[1]))
 
 
 def cmd_rss_remove(update, context):
@@ -172,6 +177,7 @@ def cmd_test(update, context):
         raise
     url = context.args[0]
     rss_d = feedparser.parse(url)
+
     if len(context.args) < 2 or len(rss_d.entries) <= int(context.args[1]):
         index = 0
     else:
@@ -219,7 +225,7 @@ def rss_monitor(context):
 def init_sqlite():
     conn = sqlite3.connect('config/rss.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE rss (name text, link text, last text)''')
+    c.execute('''CREATE TABLE rss (id INTEGER PRIMARY KEY AUTOINCREMENT,name text, link text, last text)''')
 
 
 def main():
