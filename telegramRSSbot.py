@@ -2,6 +2,7 @@ import feedparser
 import logging
 import sqlite3
 import os
+import pyyaml
 from telegram.ext import Updater, CommandHandler
 from pathlib import Path
 import message
@@ -16,7 +17,7 @@ if os.environ.get('TOKEN'):
 else:
     Token = "X"
     chatid = "X"
-    delay = 60
+    delay = 120
 
 if os.environ.get('MANAGER') and os.environ['MANAGER'] != 'X':
     manager = os.environ['MANAGER']
@@ -25,6 +26,10 @@ else:
 
 if Token == "X":
     print("Token not set!")
+
+with open('config/config.yaml',encoding='utf-8')as f:
+    conf=yaml.load(f,Loader=yaml.SafeLoader)
+    print(conf)
 
 rss_dict = {}
 
@@ -110,21 +115,22 @@ def cmd_rss_add(update, context):
     # try if there are 2 arguments passed
     feed_title=''
     try:
-        context.args[1]
+        context.args[0]
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /add 标题 RSS')
+            'ERROR: 格式需要为: /add RSS_URL')
         raise
     # try if the url is a valid RSS feed
     try:
         rss_d = feedparser.parse(context.args[1])
         rss_d.entries[0]['title']
         feed_title= rss_d.feed.title
+         print(f'\n ({rss_d.feed.title}/{context.args[1]}) attempted to use , ', end='')
     except IndexError:
         update.effective_message.reply_text(
             'ERROR: 链接看起来不像是个 RSS 源，或该源不受支持')
         raise
-    sqlite_write(context.args[0], context.args[1],
+    sqlite_write(feed_title, context.args[1],
                  str(rss_d.entries[0]['link']))
     rss_load()
     update.effective_message.reply_text(
@@ -151,7 +157,7 @@ def cmd_help(update, context):
     is_manager(update)
 
     update.effective_message.reply_text(
-        f"""RSS to Telegram bot3 \\(Weibo Ver\\.\\)
+        f"""RSS to Telegram bot \\(Weibo Ver\\.\\4)
 \n成功添加一个 RSS 源后, 机器人就会开始检查订阅，每 {delay} 秒一次。 \\(可修改\\)
 \n标题为只是为管理 RSS 源而设的，可随意选取，但不可有空格。
 \n命令:
@@ -164,7 +170,7 @@ __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号�
         parse_mode='MarkdownV2'
     )
 
-
+#测试指定RSS源
 def cmd_test(update, context):
     is_manager(update)
 
@@ -173,7 +179,7 @@ def cmd_test(update, context):
         context.args[0]
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /test RSS 条目编号(可选12)')
+            'ERROR: 格式需要为: /test RSS 条目编号(可选)')
         raise
     url = context.args[0]
     rss_d = feedparser.parse(url)
