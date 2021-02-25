@@ -2,7 +2,7 @@ import feedparser
 import logging
 import sqlite3
 import os
-import pyyaml
+import yaml
 from telegram.ext import Updater, CommandHandler
 from pathlib import Path
 import message
@@ -86,7 +86,7 @@ def sqlite_write(name, link, last, update=False):
     conn.close()
 
 
-# RSS________________________________________
+# 重新加载RSS订阅到缓存________________________________________
 def rss_load():
     # if the dict is not empty, empty it.
     if bool(rss_dict):
