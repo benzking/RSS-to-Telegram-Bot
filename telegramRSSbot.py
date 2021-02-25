@@ -16,7 +16,7 @@ if os.environ.get('TOKEN'):
 else:
     Token = "X"
     chatid = "X"
-    delay = 120
+    delay = 60
 
 if os.environ.get('MANAGER') and os.environ['MANAGER'] != 'X':
     manager = os.environ['MANAGER']
@@ -151,7 +151,7 @@ def cmd_help(update, context):
     is_manager(update)
 
     update.effective_message.reply_text(
-        f"""RSS to Telegram bot \\(Weibo Ver\\.\\)
+        f"""RSS to Telegram bot3 \\(Weibo Ver\\.\\)
 \n成功添加一个 RSS 源后, 机器人就会开始检查订阅，每 {delay} 秒一次。 \\(可修改\\)
 \n标题为只是为管理 RSS 源而设的，可随意选取，但不可有空格。
 \n命令:
@@ -173,7 +173,7 @@ def cmd_test(update, context):
         context.args[0]
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /test RSS 条目编号(可选)')
+            'ERROR: 格式需要为: /test RSS 条目编号(可选12)')
         raise
     url = context.args[0]
     rss_d = feedparser.parse(url)
