@@ -38,12 +38,10 @@ def is_manager(update):
     chat = update.message.chat
     userid = str(chat.id)
     username = chat.username
-    if chat.last_name:
-        name = chat.first_name + ' ' + chat.last_name
-    else:
-        name = chat.first_name
+    print(f'\n {chat} ', end='')
+
     command = update.message.text
-    print(f'\n{name} ({username}/{userid}) attempted to use "{command}", ', end='')
+    print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     if manager != userid:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
         print('forbade.')
