@@ -125,7 +125,8 @@ def cmd_rss_add(update, context):
         rss_d = feedparser.parse(context.args[1])
         rss_d.entries[0]['title']
         feed_title= rss_d.feed.title
-         print(f'\n ({rss_d.feed.title}/{context.args[1]}) attempted to use , ', end='')
+       
+        print(f'\n ({rss_d.feed.title}/{context.args[1]}) attempted to  ', end='')
     except IndexError:
         update.effective_message.reply_text(
             'ERROR: 链接看起来不像是个 RSS 源，或该源不受支持')
