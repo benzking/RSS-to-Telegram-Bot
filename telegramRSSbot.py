@@ -162,8 +162,7 @@ def cmd_rss_remove(update, context):
 
 def cmd_help(update, context):
     is_manager(update)
-
-     update.effective_message.reply_text(
+    update.effective_message.reply_text(
         f"""RSS to Telegram bot \\(Weibo Ver\\.\\)
 \n成功添加一个 RSS 源后, 机器人就会开始检查订阅，每 {delay} 秒一次。 \\(可修改\\)
 \n标题为只是为管理 RSS 源而设的，可随意选取，但不可有空格。
@@ -257,7 +256,7 @@ def main():
     dp.add_handler(CommandHandler("test", cmd_test, ))
     dp.add_handler(CommandHandler("list", cmd_rss_list))
     dp.add_handler(CommandHandler("remove", cmd_rss_remove))
-    # dp.add_handler(CommandHandler("setgroup", cmd_set_group))
+    dp.add_handler(CommandHandler("setgroup", cmd_set_group))
     # try to create a database if missing
     try:
         init_sqlite()
