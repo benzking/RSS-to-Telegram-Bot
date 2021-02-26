@@ -209,6 +209,7 @@ def cmd_test(update, context):
 
 def cmd_set_group(update, context):
     print(update.message.chat.id)
+    groupId=update.message.chat.id
     update.effective_message.reply_text('设置')
 
 def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
@@ -304,6 +305,7 @@ def main():
     dp.add_handler(CommandHandler("setgroup", cmd_set_group))
     dp.add_handler(CommandHandler("test1", inlinekeyboard1))
     dp.add_handler(CallbackQueryHandler(button))
+
     # try to create a database if missing
     try:
         init_sqlite()
