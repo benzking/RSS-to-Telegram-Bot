@@ -3,7 +3,14 @@ import logging
 import sqlite3
 import os
 import yaml
-from telegram.ext import Updater, CommandHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    CallbackContext,
+)
 from pathlib import Path
 import message
 
@@ -202,6 +209,41 @@ def cmd_set_group(update, context):
     print(update.message.from_user.id)
     update.effective_message.reply_text('设置')
 
+def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
+    keyboard = [
+        [
+            InlineKeyboardButton("Option 1", callback_data='1'),
+            InlineKeyboardButton("Option 2", callback_data='2'),
+        ],
+        [InlineKeyboardButton("Option 3", callback_data='3')],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text('Please choose:', reply_markup=reply_markup)
+    
+def inlinekeyboard2(update: Update, context: CallbackContext) -> None:
+    """Show new choice of buttons"""
+    query = update.callback_query
+    query.answer()
+    keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
+                 InlineKeyboardButton("Option 2", callback_data='2')],
+                [InlineKeyboardButton("Option 3", callback_data='3')],
+                [InlineKeyboardButton(text="Source code", url="https://github.com/DcSoK/ImgurPlus")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
+    )
+def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+    query.answer()
+
+    query.edit_message_text(text=f"Selected option: {query.data}")
+
+    
 def rss_monitor(context):
     update_flag = False
     for name, url_list in rss_dict.items():
@@ -257,6 +299,8 @@ def main():
     dp.add_handler(CommandHandler("list", cmd_rss_list))
     dp.add_handler(CommandHandler("remove", cmd_rss_remove))
     dp.add_handler(CommandHandler("setgroup", cmd_set_group))
+    dp.add_handler(CommandHandler("test1", inlinekeyboard1))
+    dp.add_handler(CallbackQueryHandler(button))
     # try to create a database if missing
     try:
         init_sqlite()
