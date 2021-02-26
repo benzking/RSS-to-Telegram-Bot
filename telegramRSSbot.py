@@ -42,7 +42,7 @@ with open('config/config.yaml',encoding='utf-8')as f:
     Token=conf['bot_token']
     delay=conf['update_interval']*60
     
-groupId=''
+var groupId
 rss_dict = {}
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -182,7 +182,8 @@ __*/add 标题 RSS*__ : 添加订阅
 __*/remove 标题*__ : 移除订阅
 __*/list*__ : 列出数据库中的所有订阅，包括它们的标题和 RSS 源
 __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号为 0\\-based, 不填或超出范围默认为 0\\)
-\n您的 chatid 是: {update.message.chat.id}""",
+\n您的 chatid 是: {update.message.chat.id}
+\n您的 chatid 是: {groupId}""",
         parse_mode='MarkdownV2'
     )
 
@@ -211,7 +212,8 @@ def cmd_test(update, context):
 def cmd_set_group(update, context):
     print(update.message.chat.id)
     groupId=update.message.chat.id
-    update.effective_message.reply_text('设置')
+    update.effective_message.reply_text("已设置审核群 当前群组: " + groupId+":::"+update.message.chat.id)
+
 
 def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
     keyboard = [
