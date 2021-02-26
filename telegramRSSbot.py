@@ -171,7 +171,7 @@ def cmd_rss_remove(update, context):
 
 
 def cmd_help(update, context):
-    is_manager(update)
+    # is_manager(update)
     update.effective_message.reply_text(
         f"""RSS to Telegram bot \\(Weibo Ver\\.\\)
 \n成功添加一个 RSS 源后, 机器人就会开始检查订阅，每 {delay} 秒一次。 \\(可修改\\)
@@ -213,7 +213,7 @@ def cmd_set_group(update, context):
     print(update.message.chat.id)
     groupId=update.message.chat.id
 
-    update.effective_message.reply_text("已设置审核群 当前群组: " + groupId+":::"+update.message.chat.id)
+    update.effective_message.reply_text("已设置审核群" )
 
 
 def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
