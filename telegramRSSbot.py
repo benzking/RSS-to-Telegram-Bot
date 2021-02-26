@@ -137,20 +137,21 @@ def cmd_rss_add(update, context):
 
     # try if the url is a valid RSS feed
     try:
-        rss_d = feedparser.parse(context.args[1])
+        rss_d = feedparser.parse(context.args[0])
         rss_d.entries[0]['title']
+        feed_title = rss_d.feed.title
+        feed_url = context.args[0]
     except IndexError:
-        print(f'\n ({rss_d.feed.title}/{context.args[1]}) is not rss feed ', end='')
+        print(f'\n ({rss_d.feed.title}/{feed_url}) is not rss feed ', end='')
         update.effective_message.reply_text(
             'ERROR: 链接看起来不像是个 RSS 源，或该源不受支持')
         raise
-    feed_title = rss_d.feed.title
-    feed_url = context.args[0]
+   
     sqlite_write(feed_title, feed_url,
                  str(rss_d.entries[0]['link']))
     rss_load()
     update.effective_message.reply_text(
-        '已添加 \n标题: %s\nRSS 源: %s' % (feed_title, context.args[1]))
+        '已添加 \n标题: %s\nRSS 源: %s' % (feed_title, feed_url))
 
 
 def cmd_rss_remove(update, context):
