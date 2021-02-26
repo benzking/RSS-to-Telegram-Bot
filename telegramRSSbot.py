@@ -26,6 +26,8 @@ else:
     chatid = "X"
     delay = 120
 
+
+
 if os.environ.get('MANAGER') and os.environ['MANAGER'] != 'X':
     manager = os.environ['MANAGER']
 else:
@@ -39,8 +41,8 @@ with open('config/config.yaml',encoding='utf-8')as f:
     print(conf)
     Token=conf['bot_token']
     delay=conf['update_interval']*60
-
-
+    
+groupId=''
 rss_dict = {}
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -206,7 +208,7 @@ def cmd_test(update, context):
     message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
 
 def cmd_set_group(update, context):
-    print(update.message.from_user.id)
+    print(update.message.chat.id)
     update.effective_message.reply_text('设置')
 
 def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
@@ -268,6 +270,7 @@ def rss_monitor(context):
                     # context.bot.send_message(chatid, rss_d.entries[0]['link'])
                     print('\t- Pushing', entry['link'])
                     message.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    message.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
 
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
