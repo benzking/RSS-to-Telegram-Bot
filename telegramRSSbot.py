@@ -42,7 +42,7 @@ with open('config/config.yaml',encoding='utf-8')as f:
     Token=conf['bot_token']
     delay=conf['update_interval']*60
     
-var groupId
+groupId="X"
 rss_dict = {}
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -212,6 +212,7 @@ def cmd_test(update, context):
 def cmd_set_group(update, context):
     print(update.message.chat.id)
     groupId=update.message.chat.id
+
     update.effective_message.reply_text("已设置审核群 当前群组: " + groupId+":::"+update.message.chat.id)
 
 
