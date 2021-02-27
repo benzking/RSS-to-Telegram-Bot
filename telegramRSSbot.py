@@ -211,8 +211,8 @@ def cmd_test(update, context):
 
 def cmd_set_group(update, context):
     print(update.message.chat.id)
-    groupId = update.message.chat.id
-    print(groupId)
+    chatid = update.message.chat.id
+    print(chatid)
     update.effective_message.reply_text("已设置审核群" )
 
 
