@@ -182,8 +182,7 @@ __*/add 标题 RSS*__ : 添加订阅
 __*/remove 标题*__ : 移除订阅
 __*/list*__ : 列出数据库中的所有订阅，包括它们的标题和 RSS 源
 __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号为 0\\-based, 不填或超出范围默认为 0\\)
-\n您的 chatid 是: {update.message.chat.id}
-\n您的 chatid 是: {groupId}""",
+\n您的 chatid 是: {chatid}""",
         parse_mode='MarkdownV2'
     )
 
@@ -210,6 +209,7 @@ def cmd_test(update, context):
     message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
 
 def cmd_set_group(update, context):
+    print(chatid)
     print(update.message.chat.id)
     chatid = update.message.chat.id
     print(chatid)
