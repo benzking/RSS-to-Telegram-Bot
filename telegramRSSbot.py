@@ -25,7 +25,7 @@ else:
     Token = "X"
     chatid = "X"
     delay = 120
-
+   
 
 
 if os.environ.get('MANAGER') and os.environ['MANAGER'] != 'X':
@@ -42,7 +42,7 @@ with open('config/config.yaml',encoding='utf-8')as f:
     Token=conf['bot_token']
     delay=conf['update_interval']*60
     groupId=conf['group_id']
-groupId=2
+
 rss_dict = {}
 groupId=3
 
@@ -183,7 +183,8 @@ __*/add 标题 RSS*__ : 添加订阅
 __*/remove 标题*__ : 移除订阅
 __*/list*__ : 列出数据库中的所有订阅，包括它们的标题和 RSS 源
 __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号为 0\\-based, 不填或超出范围默认为 0\\)
-\n您的 chatid 是: {chatid}""",
+\n您的 chatid 是: {chatid}
+\n您的 chatid 是: {groupId}""",
         parse_mode='MarkdownV2'
     )
 
@@ -196,19 +197,14 @@ def cmd_test(update, context):
         context.args[0]
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /test RSS 条目编号(可选)')
+            'ERROR: 格式需要为: /test RSS_URL ')
         raise
-    print(groupId)
+
     url = context.args[0]
     rss_d = feedparser.parse(url)
 
-    if len(context.args) < 2 or len(rss_d.entries) <= int(context.args[1]):
-        index = 0
-    else:
-        index = int(context.args[1])
-    rss_d.entries[index]['link']
     # update.effective_message.reply_text(rss_d.entries[0]['link'])
-    message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
+    message.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
 
 def cmd_set_group(update, context):
     global groupId
