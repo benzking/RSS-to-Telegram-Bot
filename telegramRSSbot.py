@@ -199,7 +199,6 @@ def cmd_test(update, context):
             'ERROR: 格式需要为: /test RSS 条目编号(可选)')
         raise
     print(groupId)
-    print(self.groupId)
     url = context.args[0]
     rss_d = feedparser.parse(url)
 
@@ -212,12 +211,12 @@ def cmd_test(update, context):
     message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
 
 def cmd_set_group(update, context):
-
+    global groupId
     print(groupId)
     #update.effective_message.reply_text("已设置审核群" )
     context.bot.send_message(update.message.chat_id,
                              text="已设置本群为审稿群")
-    self.groupId=update.message.chat_id
+    groupId=update.message.chat_id
     print(groupId)
 
 
