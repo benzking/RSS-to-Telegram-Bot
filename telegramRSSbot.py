@@ -41,9 +41,10 @@ with open('config/config.yaml',encoding='utf-8')as f:
     print(conf)
     Token=conf['bot_token']
     delay=conf['update_interval']*60
-    
-groupId=0
+    groupId=conf['group_id']
+groupId=2
 rss_dict = {}
+groupId=3
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.WARNING)
@@ -209,11 +210,12 @@ def cmd_test(update, context):
     message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
 
 def cmd_set_group(update, context):
-    print(chatid)
-    print(update.message.chat.id)
-    chatid = update.message.chat.id
-    print(chatid)
-    update.effective_message.reply_text("已设置审核群" )
+
+    print(groupId)
+    #update.effective_message.reply_text("已设置审核群" )
+    bot.send_message(groupId=update.message.chat_id,
+                             text="已设置本群为审稿群")
+     print(groupId)
 
 
 def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
