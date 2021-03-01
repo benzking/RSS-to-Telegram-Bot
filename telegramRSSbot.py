@@ -215,6 +215,8 @@ def cmd_set_group(update, context):
     #update.effective_message.reply_text("已设置审核群" )
     bot.send_message(groupId=update.message.chat_id,
                              text="已设置本群为审稿群")
+    context.bot.send_message(groupId=update.message.chat_id,
+                             text="已设置本群为审稿群")
     print(groupId)
 
 
