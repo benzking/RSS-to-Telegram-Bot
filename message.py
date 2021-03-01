@@ -56,8 +56,8 @@ def send_text_message(chatid, xml, feed_title, url, is_tail, context):
         if number > 1:
             head = rf'\({i + 1}/{number}\)' + '\n'
         message=context.bot.send_message(chatid, head + text_list[i], parse_mode='MarkdownV2', disable_web_page_preview=True)
-        context.bot.forward_message(chatid,chatid,True,message.message_id)
         print('\t\t\t- Text message.')
+        print(message.message_id)
 
 
 def send_media_message(chatid, xml, feed_title, url, media, context):
