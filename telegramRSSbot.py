@@ -41,9 +41,10 @@ with open('config/config.yaml',encoding='utf-8')as f:
     print(conf)
     Token=conf['bot_token']
     delay=conf['update_interval']*60
-    
-groupId="X"
+    groupId=conf['group_id']
+groupId=2
 rss_dict = {}
+groupId=3
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.WARNING)
@@ -182,8 +183,7 @@ __*/add 标题 RSS*__ : 添加订阅
 __*/remove 标题*__ : 移除订阅
 __*/list*__ : 列出数据库中的所有订阅，包括它们的标题和 RSS 源
 __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号为 0\\-based, 不填或超出范围默认为 0\\)
-\n您的 chatid 是: {update.message.chat.id}
-\n您的 chatid 是: {groupId}""",
+\n您的 chatid 是: {chatid}""",
         parse_mode='MarkdownV2'
     )
 
@@ -198,22 +198,26 @@ def cmd_test(update, context):
         update.effective_message.reply_text(
             'ERROR: 格式需要为: /test RSS 条目编号(可选)')
         raise
+    print(groupId)
     url = context.args[0]
     rss_d = feedparser.parse(url)
 
-    if  len(rss_d.entries) == 0:
-    update.effective_message.reply_text('RSS源读取失败')
-        
-    
-
+    if len(context.args) < 2 or len(rss_d.entries) <= int(context.args[1]):
+        index = 0
+    else:
+        index = int(context.args[1])
+    rss_d.entries[index]['link']
     # update.effective_message.reply_text(rss_d.entries[0]['link'])
-    message.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
+    message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
 
 def cmd_set_group(update, context):
-    print(update.message.chat.id)
-    groupId=update.message.chat.id
-
-    update.effective_message.reply_text("已设置审核群" )
+    global groupId
+    print(groupId)
+    #update.effective_message.reply_text("已设置审核群" )
+    context.bot.send_message(update.message.chat_id,
+                             text="已设置本群为审稿群")
+    groupId=update.message.chat_id
+    print(groupId)
 
 
 def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
@@ -275,8 +279,8 @@ def rss_monitor(context):
                     # context.bot.send_message(chatid, rss_d.entries[0]['link'])
                     print('\t- Pushing', entry['link'])
                     message.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
-                    print(groupId)
-                    # message.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    global groupId
+                    message.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
 
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
