@@ -1,5 +1,6 @@
 import traceback
 import telegram.ext
+import telegram
 from media import get_valid_media
 from xmlparser import get_md
 from telegramRSSbot import manager
@@ -54,9 +55,9 @@ def send_text_message(chatid, xml, feed_title, url, is_tail, context):
     for i in range(is_tail, number):
         if number > 1:
             head = rf'\({i + 1}/{number}\)' + '\n'
-        context.bot.send_message(chatid, head + text_list[i], parse_mode='MarkdownV2', disable_web_page_preview=True)
+        message=context.bot.send_message(chatid, head + text_list[i], parse_mode='MarkdownV2', disable_web_page_preview=True)
         print('\t\t\t- Text message.')
-
+        print(message.message_id)
 
 def send_media_message(chatid, xml, feed_title, url, media, context):
     text_list = get_md(xml, feed_title, url, 1024)
