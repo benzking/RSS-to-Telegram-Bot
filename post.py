@@ -3,7 +3,7 @@ import telegram.ext
 import telegram
 from media import get_valid_media
 from xmlparser import get_md
-from telegramRSSbot import post
+from telegramRSSbot import manager
 
 
 def send(chatid, xml, feed_title, url, context):
