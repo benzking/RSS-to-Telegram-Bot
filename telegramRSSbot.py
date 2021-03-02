@@ -6,8 +6,8 @@ import yaml
 from telegram  import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
-    update,
-    message,
+    Update,
+    Message,
     )
 from telegram.ext import (
     Updater,
@@ -68,7 +68,12 @@ def is_manager(update):
     #     name = chat.first_name
     command = update.message.text
     print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
-    if manager != userid:
+    is_allowed_user =False
+    for str(allowed_user) in conf['allowed_users']:
+        if allowed_user == userid:
+            is_allowed_user=True
+
+    if not is_allowed_user:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
         print('forbade.')
         raise
