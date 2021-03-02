@@ -69,8 +69,8 @@ def is_manager(update):
     command = update.message.text
     print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     is_allowed_user =False
-    for str(allowed_user) in conf['allowed_users']:
-        if allowed_user == userid:
+    for allowed_user in conf['allowed_users']:
+        if str(allowed_user) == userid:
             is_allowed_user=True
 
     if not is_allowed_user:
