@@ -3,11 +3,11 @@ import logging
 import sqlite3
 import os
 import yaml
-from telegram import (
-    InlineKeyboardMarkup
-    InlineKeyboardButton
-    update
-    message
+from telegram  import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    update,
+    message,
     )
 from telegram.ext import (
     Updater,
