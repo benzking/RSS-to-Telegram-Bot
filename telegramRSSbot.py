@@ -216,7 +216,7 @@ def cmd_set_group(update, context):
     print(groupId)
 
 
-def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
+def inlinekeyboard1(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
     keyboard = [
         [
             InlineKeyboardButton("Option 1", callback_data='1'),
@@ -229,7 +229,7 @@ def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
 
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
     
-def inlinekeyboard2(update: Update, context: CallbackContext) -> None:
+def inlinekeyboard2(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -241,7 +241,7 @@ def inlinekeyboard2(update: Update, context: CallbackContext) -> None:
     query.edit_message_text(
         text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
-def button(update: Update, context: CallbackContext) -> None:
+def button(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
