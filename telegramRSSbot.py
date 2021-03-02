@@ -2,7 +2,15 @@ import feedparser
 import logging
 import sqlite3
 import os
-from telegram.ext import Updater, CommandHandler
+import yaml
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    CallbackContext,
+)
 from pathlib import Path
 import message
 
@@ -17,6 +25,8 @@ else:
     Token = "X"
     chatid = "X"
     delay = 120
+   
+
 
 if os.environ.get('MANAGER') and os.environ['MANAGER'] != 'X':
     manager = os.environ['MANAGER']
@@ -26,20 +36,33 @@ else:
 if Token == "X":
     print("Token not set!")
 
+with open('config/config.yaml',encoding='utf-8')as f:
+    conf=yaml.load(f,Loader=yaml.FullLoader)
+    print(conf)
+    Token=conf['bot_token']
+    delay=conf['update_interval']*60
+    groupId=conf['group_id']
+
 rss_dict = {}
+groupId=3
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+                    level=logging.WARNING)
+# logging.getLogger('apscheduler.executors.default').propagate = False  # to use this line, set log level to INFO
 
 
-# MANAGER
+# 检查是否有管理员权限
 def is_manager(update):
     chat = update.message.chat
     userid = str(chat.id)
     username = chat.username
-    name = chat.first_name + ' ' + chat.last_name
+    # print(f'\n {chat} ', end='')
+    # if chat.last_name:
+    #     name = chat.first_name + ' ' + chat.last_name
+    # else:
+    #     name = chat.first_name
     command = update.message.text
-    print(f'\n{name} ({username}/{userid}) attempted to use "{command}", ', end='')
+    print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     if manager != userid:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
         print('forbade.')
@@ -57,7 +80,7 @@ def sqlite_connect():
 def sqlite_load_all():
     sqlite_connect()
     c = conn.cursor()
-    c.execute('SELECT * FROM rss')
+    c.execute('SELECT name,link,last FROM rss')
     rows = c.fetchall()
     conn.close()
     return rows
@@ -76,7 +99,7 @@ def sqlite_write(name, link, last, update=False):
     conn.close()
 
 
-# RSS________________________________________
+# 重新加载RSS订阅到缓存________________________________________
 def rss_load():
     # if the dict is not empty, empty it.
     if bool(rss_dict):
@@ -103,25 +126,33 @@ def cmd_rss_add(update, context):
     is_manager(update)
 
     # try if there are 2 arguments passed
+    feed_title=''
+    feed_url=''
     try:
-        context.args[1]
+        context.args[0]
+
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /add 标题 RSS')
+            'ERROR: 格式需要为: /add RSS_URL')
         raise
+
     # try if the url is a valid RSS feed
     try:
-        rss_d = feedparser.parse(context.args[1])
+        rss_d = feedparser.parse(context.args[0])
         rss_d.entries[0]['title']
+        feed_title = rss_d.feed.title
+        feed_url = context.args[0]
     except IndexError:
+        print(f'\n ({rss_d.feed.title}/{feed_url}) is not rss feed ', end='')
         update.effective_message.reply_text(
             'ERROR: 链接看起来不像是个 RSS 源，或该源不受支持')
         raise
-    sqlite_write(context.args[0], context.args[1],
+   
+    sqlite_write(feed_title, feed_url,
                  str(rss_d.entries[0]['link']))
     rss_load()
     update.effective_message.reply_text(
-        '已添加 \n标题: %s\nRSS 源: %s' % (context.args[0], context.args[1]))
+        '已添加 \n标题: %s\nRSS 源: %s' % (feed_title, feed_url))
 
 
 def cmd_rss_remove(update, context):
@@ -141,8 +172,7 @@ def cmd_rss_remove(update, context):
 
 
 def cmd_help(update, context):
-    is_manager(update)
-
+    # is_manager(update)
     update.effective_message.reply_text(
         f"""RSS to Telegram bot \\(Weibo Ver\\.\\)
 \n成功添加一个 RSS 源后, 机器人就会开始检查订阅，每 {delay} 秒一次。 \\(可修改\\)
@@ -153,11 +183,12 @@ __*/add 标题 RSS*__ : 添加订阅
 __*/remove 标题*__ : 移除订阅
 __*/list*__ : 列出数据库中的所有订阅，包括它们的标题和 RSS 源
 __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号为 0\\-based, 不填或超出范围默认为 0\\)
-\n您的 chatid 是: {update.message.chat.id}""",
+\n您的 chatid 是: {chatid}
+\n您的 chatid 是: {groupId}""",
         parse_mode='MarkdownV2'
     )
 
-
+#测试指定RSS源
 def cmd_test(update, context):
     is_manager(update)
 
@@ -166,19 +197,60 @@ def cmd_test(update, context):
         context.args[0]
     except IndexError:
         update.effective_message.reply_text(
-            'ERROR: 格式需要为: /test RSS 条目编号(可选)')
+            'ERROR: 格式需要为: /test RSS_URL ')
         raise
+
     url = context.args[0]
     rss_d = feedparser.parse(url)
-    if len(context.args) < 2 or len(rss_d.entries) <= int(context.args[1]):
-        index = 0
-    else:
-        index = int(context.args[1])
-    rss_d.entries[index]['link']
+
     # update.effective_message.reply_text(rss_d.entries[0]['link'])
-    message.send(chatid, rss_d.entries[index]['summary'], rss_d.feed.title, rss_d.entries[index]['link'], context)
+    message.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
+
+def cmd_set_group(update, context):
+    global groupId
+    print(groupId)
+    #update.effective_message.reply_text("已设置审核群" )
+    context.bot.send_message(update.message.chat_id,
+                             text="已设置本群为审稿群")
+    groupId=update.message.chat_id
+    print(groupId)
 
 
+def inlinekeyboard1(update: Update, context: CallbackContext) -> None:
+    keyboard = [
+        [
+            InlineKeyboardButton("Option 1", callback_data='1'),
+            InlineKeyboardButton("Option 2", callback_data='2'),
+        ],
+        [InlineKeyboardButton("Option 3", callback_data='3')],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text('Please choose:', reply_markup=reply_markup)
+    
+def inlinekeyboard2(update: Update, context: CallbackContext) -> None:
+    """Show new choice of buttons"""
+    query = update.callback_query
+    query.answer()
+    keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
+                 InlineKeyboardButton("Option 2", callback_data='2')],
+                [InlineKeyboardButton("Option 3", callback_data='3')],
+                [InlineKeyboardButton(text="Source code", url="https://github.com/DcSoK/ImgurPlus")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
+    )
+def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+    query.answer()
+
+    query.edit_message_text(text=f"Selected option: {query.data}")
+
+    
 def rss_monitor(context):
     update_flag = False
     for name, url_list in rss_dict.items():
@@ -203,6 +275,8 @@ def rss_monitor(context):
                     # context.bot.send_message(chatid, rss_d.entries[0]['link'])
                     print('\t- Pushing', entry['link'])
                     message.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    global groupId
+                    message.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
 
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
@@ -217,7 +291,7 @@ def rss_monitor(context):
 def init_sqlite():
     conn = sqlite3.connect('config/rss.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE rss (name text, link text, last text)''')
+    c.execute('''CREATE TABLE rss (id INTEGER PRIMARY KEY AUTOINCREMENT,name text, link text, last text)''')
 
 
 def main():
@@ -233,6 +307,9 @@ def main():
     dp.add_handler(CommandHandler("test", cmd_test, ))
     dp.add_handler(CommandHandler("list", cmd_rss_list))
     dp.add_handler(CommandHandler("remove", cmd_rss_remove))
+    dp.add_handler(CommandHandler("setgroup", cmd_set_group))
+    dp.add_handler(CommandHandler("test1", inlinekeyboard1))
+    dp.add_handler(CallbackQueryHandler(button))
 
     # try to create a database if missing
     try:

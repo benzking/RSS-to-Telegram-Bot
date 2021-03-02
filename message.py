@@ -1,5 +1,6 @@
 import traceback
 import telegram.ext
+import telegram
 from media import get_valid_media
 from xmlparser import get_md
 from telegramRSSbot import manager
@@ -14,8 +15,12 @@ def send(chatid, xml, feed_title, url, context):
             print(f'\t\t- Send {url} failed!')
             traceback.print_exc()
             # send an error message to manager (if set) or chatid
-            send_message(manager, 'Something went wrong while sending this message. Please check:<br><br>' +
-                         traceback.format_exc().replace('\n', '<br>'), feed_title, url, context)
+            try:
+                send_message(manager, 'Something went wrong while sending this message. Please check:<br><br>' +
+                             traceback.format_exc().replace('\n', '<br>'), feed_title, url, context)
+            except:
+                send_message(manager, 'Something went wrong while sending this message, but error msg sent failed.\n'
+                                      'Please check logs manually.', feed_title, url, context)
 
 
 def send_message(chatid, xml, feed_title, url, context):
@@ -50,9 +55,10 @@ def send_text_message(chatid, xml, feed_title, url, is_tail, context):
     for i in range(is_tail, number):
         if number > 1:
             head = rf'\({i + 1}/{number}\)' + '\n'
-        context.bot.send_message(chatid, head + text_list[i], parse_mode='MarkdownV2', disable_web_page_preview=True)
+        message=context.bot.send_message(chatid, head + text_list[i], parse_mode='MarkdownV2', disable_web_page_preview=True)
         print('\t\t\t- Text message.')
-
+        print(message.message_id)
+        
 
 def send_media_message(chatid, xml, feed_title, url, media, context):
     text_list = get_md(xml, feed_title, url, 1024)
@@ -67,8 +73,9 @@ def send_media_message(chatid, xml, feed_title, url, media, context):
                                supports_streaming=True)
         print('\t\t\t- Video message.')
     elif len(media) == 1:
-        context.bot.send_photo(chatid, media[0], head + text_list[0], parse_mode='MarkdownV2')
+        message=context.bot.send_photo(chatid, media[0], head + text_list[0], parse_mode='MarkdownV2')
         print('\t\t\t-Single pic message.')
+        context.bot.forward_message(chatid,chatid,False,message.message_id)
     else:
         pic_objs = get_pic_objs(media, head + text_list[0])
         context.bot.send_media_group(chatid, pic_objs)
