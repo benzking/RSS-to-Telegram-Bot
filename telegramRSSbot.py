@@ -219,13 +219,13 @@ def cmd_set_group(update, context):
 def inlinekeyboard1(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
     keyboard = [
         [
-            InlineKeyboardButton("Option 1", callback_data='1'),
-            InlineKeyboardButton("Option 2", callback_data='2'),
+            telegram.InlineKeyboardButton("Option 1", callback_data='1'),
+            telegram.InlineKeyboardButton("Option 2", callback_data='2'),
         ],
-        [InlineKeyboardButton("Option 3", callback_data='3')],
+        [telegram.InlineKeyboardButton("Option 3", callback_data='3')],
     ]
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = telegram.InlineKeyboardMarkup(keyboard)
 
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
     
@@ -233,11 +233,11 @@ def inlinekeyboard2(update: telegram.Update, context: telegram.ext.CallbackConte
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
-    keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
-                 InlineKeyboardButton("Option 2", callback_data='2')],
-                [InlineKeyboardButton("Option 3", callback_data='3')],
-                [InlineKeyboardButton(text="Source code", url="https://github.com/DcSoK/ImgurPlus")]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    keyboard = [[telegram.InlineKeyboardButton("Option 1", callback_data='1'),
+                 telegram.InlineKeyboardButton("Option 2", callback_data='2')],
+                [telegram.InlineKeyboardButton("Option 3", callback_data='3')],
+                [telegram.InlineKeyboardButton(text="Source code", url="https://github.com/DcSoK/ImgurPlus")]]
+    reply_markup = telegram.InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
         text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
@@ -299,7 +299,7 @@ def init_sqlite():
 def main():
     print(f'CHATID: {chatid}\nMANAGER: {manager}\nDELAY: {delay}s\n')
 
-    updater = Updater(token=Token, use_context=True)
+    updater = telegram.ext.Updater(token=Token, use_context=True)
     job_queue = updater.job_queue
     dp = updater.dispatcher
 
