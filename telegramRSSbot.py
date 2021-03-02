@@ -201,12 +201,10 @@ def cmd_test(update, context):
 
     url = context.args[0]
     rss_d = feedparser.parse(url)
-    if(rss_d.entries 
-        and len(rss_d.entries) > 0)
-        post.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
-    else
-        context.bot.send_message(update.message.chat_id,
-                             text="RSS测试出错")
+    #if(rss_d.entries 
+    #    and len(rss_d.entries) > 0 )
+    post.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
+    #else
 
 def cmd_set_group(update, context):
 
