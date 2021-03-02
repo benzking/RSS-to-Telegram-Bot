@@ -3,7 +3,7 @@ import logging
 import sqlite3
 import os
 import yaml
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+import telegram 
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -12,7 +12,7 @@ from telegram.ext import (
     CallbackContext,
 )
 from pathlib import Path
-import message
+import post
 
 Path("config").mkdir(parents=True, exist_ok=True)
 
@@ -183,8 +183,7 @@ __*/add 标题 RSS*__ : 添加订阅
 __*/remove 标题*__ : 移除订阅
 __*/list*__ : 列出数据库中的所有订阅，包括它们的标题和 RSS 源
 __*/test RSS 编号\\(可选\\)*__ : 从 RSS 源处获取一条 post \\(编号为 0\\-based, 不填或超出范围默认为 0\\)
-\n您的 chatid 是: {chatid}
-\n您的 chatid 是: {groupId}""",
+\n您的 chatid 是: {chatid}""",
         parse_mode='MarkdownV2'
     )
 
@@ -202,11 +201,15 @@ def cmd_test(update, context):
 
     url = context.args[0]
     rss_d = feedparser.parse(url)
-
-    # update.effective_message.reply_text(rss_d.entries[0]['link'])
-    message.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
+    if(rss_d.entries 
+        and len(rss_d.entries) > 0)
+        post.send(chatid, rss_d.entries[0]['summary'], rss_d.feed.title, rss_d.entries[0]['link'], context)
+    else
+        context.bot.send_message(update.message.chat_id,
+                             text="RSS测试出错")
 
 def cmd_set_group(update, context):
+
     global groupId
     print(groupId)
     #update.effective_message.reply_text("已设置审核群" )
@@ -274,10 +277,10 @@ def rss_monitor(context):
                 if last_flag:
                     # context.bot.send_message(chatid, rss_d.entries[0]['link'])
                     print('\t- Pushing', entry['link'])
-                    message.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    message_info=post.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
                     global groupId
-                    message.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
-
+                    message_info=post.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    print(message)
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
 
