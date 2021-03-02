@@ -3,19 +3,8 @@ import logging
 import sqlite3
 import os
 import yaml
-from telegram  import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    Update,
-    Message,
-    )
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-    CallbackQueryHandler,
-    ConversationHandler,
-    CallbackContext,
-)
+import telegram 
+import telegram.ext  
 from pathlib import Path
 import post
 
