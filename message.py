@@ -58,6 +58,7 @@ def send_text_message(chatid, xml, feed_title, url, is_tail, context):
         message=context.bot.send_message(chatid, head + text_list[i], parse_mode='MarkdownV2', disable_web_page_preview=True)
         print('\t\t\t- Text message.')
         print(message.message_id)
+        
 
 def send_media_message(chatid, xml, feed_title, url, media, context):
     text_list = get_md(xml, feed_title, url, 1024)
@@ -72,8 +73,9 @@ def send_media_message(chatid, xml, feed_title, url, media, context):
                                supports_streaming=True)
         print('\t\t\t- Video message.')
     elif len(media) == 1:
-        context.bot.send_photo(chatid, media[0], head + text_list[0], parse_mode='MarkdownV2')
+        message=context.bot.send_photo(chatid, media[0], head + text_list[0], parse_mode='MarkdownV2')
         print('\t\t\t-Single pic message.')
+        context.bot.forward_message(chatid,chatid,False,message.message.message_id)
     else:
         pic_objs = get_pic_objs(media, head + text_list[0])
         context.bot.send_media_group(chatid, pic_objs)
