@@ -278,7 +278,7 @@ def rss_monitor(context):
                     global groupId
                     message_info=post.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
                     
-                    context.bot.forward_message(groupId,message_info.chat.id,True,message_info.message_id)
+                    #context.bot.forward_message(groupId,message_info.chat.id,True,message_info.message_id)
                     print(message_info)
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
