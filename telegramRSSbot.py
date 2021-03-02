@@ -303,15 +303,15 @@ def main():
     job_queue = updater.job_queue
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler("add", cmd_rss_add))
-    dp.add_handler(CommandHandler("start", cmd_help))
-    dp.add_handler(CommandHandler("help", cmd_help))
-    dp.add_handler(CommandHandler("test", cmd_test, ))
-    dp.add_handler(CommandHandler("list", cmd_rss_list))
-    dp.add_handler(CommandHandler("remove", cmd_rss_remove))
-    dp.add_handler(CommandHandler("setgroup", cmd_set_group))
-    dp.add_handler(CommandHandler("test1", inlinekeyboard1))
-    dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(telegram.ext.CommandHandler("add", cmd_rss_add))
+    dp.add_handler(telegram.ext.CommandHandler("start", cmd_help))
+    dp.add_handler(telegram.ext.CommandHandler("help", cmd_help))
+    dp.add_handler(telegram.ext.CommandHandler("test", cmd_test, ))
+    dp.add_handler(telegram.ext.CommandHandler("list", cmd_rss_list))
+    dp.add_handler(telegram.ext.CommandHandler("remove", cmd_rss_remove))
+    dp.add_handler(telegram.ext.CommandHandler("setgroup", cmd_set_group))
+    dp.add_handler(telegram.ext.CommandHandler("test1", inlinekeyboard1))
+    dp.add_handler(telegram.ext.CallbackQueryHandler(button))
 
     # try to create a database if missing
     try:
