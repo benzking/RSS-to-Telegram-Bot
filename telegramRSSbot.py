@@ -47,7 +47,7 @@ with open('config/config.yaml',encoding='utf-8')as f:
     Token=conf['bot_token']
     delay=conf['update_interval']*60
     groupId=conf['group_id']
-    
+
 groupId=90532269
 rss_dict = {}
 
@@ -62,11 +62,9 @@ def is_manager(update):
     chat = update.message.chat
     userid = str(chat.id)
     username = chat.username
-    # print(f'\n {chat} ', end='')
-    # if chat.last_name:
-    #     name = chat.first_name + ' ' + chat.last_name
-    # else:
-    #     name = chat.first_name
+
+    userid=update.message.from_user.id
+    username = update.message.from_user.username
     command = update.message.text
     print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     is_allowed_user =False
@@ -290,6 +288,8 @@ def rss_monitor(context):
                     message_info=post.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
                     global groupId
                     message_info=post.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    
+                    context.bot.forward_message(groupId,message_info.chat.id,True,message_info.message_id)
                     print(message_info)
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
