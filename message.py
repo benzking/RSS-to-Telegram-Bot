@@ -75,7 +75,7 @@ def send_media_message(chatid, xml, feed_title, url, media, context):
     elif len(media) == 1:
         message=context.bot.send_photo(chatid, media[0], head + text_list[0], parse_mode='MarkdownV2')
         print('\t\t\t-Single pic message.')
-        context.bot.forward_message(chatid,chatid,False,message.message.message_id)
+        context.bot.forward_message(chatid,chatid,False,message.message_id)
     else:
         pic_objs = get_pic_objs(media, head + text_list[0])
         context.bot.send_media_group(chatid, pic_objs)
