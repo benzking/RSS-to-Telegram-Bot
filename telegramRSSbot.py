@@ -47,9 +47,10 @@ with open('config/config.yaml',encoding='utf-8')as f:
     Token=conf['bot_token']
     delay=conf['update_interval']*60
     groupId=conf['group_id']
-
+    
+groupId=90532269
 rss_dict = {}
-groupId=3
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.WARNING)
@@ -73,7 +74,8 @@ def is_manager(update):
         if str(allowed_user) == userid:
             is_allowed_user=True
 
-    if not is_allowed_user:
+
+    if is_allowed_user==False:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
         print('forbade.')
         raise
@@ -288,7 +290,7 @@ def rss_monitor(context):
                     message_info=post.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
                     global groupId
                     message_info=post.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
-                    print(message)
+                    print(message_info)
                 if url_list[1] == entry['link']:  # a sent post detected, the rest of posts in the list will be sent
                     last_flag = True
 
