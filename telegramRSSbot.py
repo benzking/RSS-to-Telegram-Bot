@@ -223,7 +223,7 @@ def post_ok(update, context):
     print(conf['chanle_name'])
     print(update.effective_message)
     print(update.effective_message.reply_to_message)
-    context.bot.copy_message(chat_id=conf['chanle_name'],
+    context.bot.copy_message(chat_id=update.message.chat_id,
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
                  )
