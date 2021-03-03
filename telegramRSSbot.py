@@ -312,11 +312,13 @@ def init_sqlite():
     c = conn.cursor()
     c.execute('''CREATE TABLE rss (id INTEGER PRIMARY KEY AUTOINCREMENT,name text, link text, last text)''')
 
-    c.execute('''CREATE TABLE approved (id INTEGER PRIMARY KEY AUTOINCREMENT,title text, link text,md5str text,chat_id INTEGER,message_id INTEGER, 
+    c.execute('''CREATE TABLE approved (approved_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        rss_name,title text, link text,md5str text,chat_id INTEGER,message_id INTEGER, 
         post_time text,approved_time text,
         approved_user_id INTEGER,approved_user_name text,
         approved_chat_id INTEGER,approved_chat_id text)''')
-    c.execute('''CREATE TABLE post (id INTEGER PRIMARY KEY AUTOINCREMENT,approved_id INTEGER,chat_id text,message_id INTEGER)''')
+    c.execute('''CREATE TABLE post (post_id INTEGER PRIMARY KEY AUTOINCREMENT,link text,
+        chat_id text,message_id INTEGER)''')
 
 def main():
     print(f'CHATID: {chatid}\nMANAGER: {manager}\nDELAY: {delay}s\n')
