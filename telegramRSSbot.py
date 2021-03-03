@@ -225,8 +225,12 @@ def post_ok(update, context):
     print(update.effective_message.reply_to_message)
     context.bot.copy_message(chat_id=update.message.chat_id,
                  from_chat_id=update.effective_message.chat_id,
-                 message_id=update.effective_message.message_id,
+                 message_id=update.effective_message.reply_to_message.message_id,
                  )
+    context.bot.forward_message(chat_id=groupId,
+        from_chat_id = update.effective_message.chat_id,
+        disable_notification =True,
+        message_id=update.effective_message.message_id)
 
 
 def inlinekeyboard1(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
