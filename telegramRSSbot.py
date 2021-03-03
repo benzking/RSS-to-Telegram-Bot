@@ -48,25 +48,22 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 # 检查是否有管理员权限
 def is_manager(update):
-    chat = update.message.chat
-    userid = str(chat.id)
-    username = chat.username
+    # chat = update.message.chat
+    # userid = str(chat.id)
+    # username = chat.username
 
     userid=update.message.from_user.id
     username = update.message.from_user.username
     command = update.message.text
     print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     is_allowed_user =False
-    for allowed_user in conf['allowed_users']:
-        print(allowed_user)
-        if allowed_user == userid:
-            print(True)
+    for allowed_user in conf['allowed_users']: 
+        if allowed_user == userid: 
             is_allowed_user=True
 
 
     if is_allowed_user==False:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
-
         print('forbade.')
         raise
     else:
@@ -215,12 +212,21 @@ def cmd_set_group(update, context):
     #update.effective_message.reply_text("已设置审核群" )
     context.bot.send_message(update.message.chat_id,
                              text="已设置本群为审稿群")
-    context.bot.copy_message(chat_id=update.message.chat_id,
+    # context.bot.copy_message(chat_id=update.message.chat_id,
+    #              from_chat_id=update.effective_message.chat_id,
+    #              message_id=update.effective_message.message_id,
+    #              )
+    groupId=update.message.chat_id
+    print(groupId)
+
+def post_ok(update, context):
+    print(conf['chanle_name'])
+    print(update.effective_message)
+    print(update.effective_message.reply_to_message)
+    context.bot.copy_message(chat_id=conf['chanle_name'],
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
                  )
-    groupId=update.message.chat_id
-    print(groupId)
 
 
 def inlinekeyboard1(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
@@ -318,6 +324,7 @@ def main():
     dp.add_handler(telegram.ext.CommandHandler("remove", cmd_rss_remove))
     dp.add_handler(telegram.ext.CommandHandler("setgroup", cmd_set_group))
     dp.add_handler(telegram.ext.CommandHandler("test1", inlinekeyboard1))
+    dp.add_handler(telegram.ext.CommandHandler("test1", post_ok))
     dp.add_handler(telegram.ext.CallbackQueryHandler(button))
 
     # try to create a database if missing
