@@ -58,12 +58,15 @@ def is_manager(update):
     print(f'\n ({username}/{userid}) attempted to use "{command}", ', end='')
     is_allowed_user =False
     for allowed_user in conf['allowed_users']:
-        if str(allowed_user) == userid:
+        print(allowed_user)
+        if allowed_user == userid:
+            print(True)
             is_allowed_user=True
 
 
     if is_allowed_user==False:
         update.effective_message.reply_text('您没有权限使用这个机器人。')
+
         print('forbade.')
         raise
     else:
@@ -212,6 +215,10 @@ def cmd_set_group(update, context):
     #update.effective_message.reply_text("已设置审核群" )
     context.bot.send_message(update.message.chat_id,
                              text="已设置本群为审稿群")
+    context.bot.copy_message(chat_id=update.message.chat_id,
+                 from_chat_id=update.effective_message.chat_id,
+                 message_id=update.effective_message.message_id,
+                 )
     groupId=update.message.chat_id
     print(groupId)
 
