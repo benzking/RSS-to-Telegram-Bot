@@ -324,7 +324,7 @@ def main():
     dp.add_handler(telegram.ext.CommandHandler("remove", cmd_rss_remove))
     dp.add_handler(telegram.ext.CommandHandler("setgroup", cmd_set_group))
     dp.add_handler(telegram.ext.CommandHandler("test1", inlinekeyboard1))
-    dp.add_handler(telegram.ext.CommandHandler("test1", post_ok))
+    dp.add_handler(telegram.ext.CommandHandler("ok", post_ok))
     dp.add_handler(telegram.ext.CallbackQueryHandler(button))
 
     # try to create a database if missing
