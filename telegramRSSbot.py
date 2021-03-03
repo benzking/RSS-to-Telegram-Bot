@@ -312,6 +312,11 @@ def init_sqlite():
     c = conn.cursor()
     c.execute('''CREATE TABLE rss (id INTEGER PRIMARY KEY AUTOINCREMENT,name text, link text, last text)''')
 
+    c.execute('''CREATE TABLE approved (id INTEGER PRIMARY KEY AUTOINCREMENT,title text, link text,md5str text,chat_id INTEGER,message_id INTEGER, 
+        post_time text,approved_time text,
+        approved_user_id INTEGER,approved_user_name text,
+        approved_chat_id INTEGER,approved_chat_id text)''')
+    c.execute('''CREATE TABLE post (id INTEGER PRIMARY KEY AUTOINCREMENT,approved_id INTEGER,chat_id text,message_id INTEGER)''')
 
 def main():
     print(f'CHATID: {chatid}\nMANAGER: {manager}\nDELAY: {delay}s\n')
@@ -330,6 +335,7 @@ def main():
     dp.add_handler(telegram.ext.CommandHandler("test1", inlinekeyboard1))
     dp.add_handler(telegram.ext.CommandHandler("ok", post_ok))
     dp.add_handler(telegram.ext.CallbackQueryHandler(button))
+    dp.add_handler(telegram.ext.CommandHandler("no", post_ok))
 
     # try to create a database if missing
     try:
