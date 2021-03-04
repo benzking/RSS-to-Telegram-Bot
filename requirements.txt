@@ -3,3 +3,5 @@ python-telegram-bot
 html2text
 bs4
 pyyaml
+export_to_telegraph
+html_telegraph_poster

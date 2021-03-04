@@ -220,9 +220,9 @@ def cmd_set_group(update, context):
     print(groupId)
 
 def post_ok(update, context):
-    print(conf['chanle_name'])
-    print(update.effective_message)
-    print(update.effective_message.reply_to_message)
+    # print(conf['chanle_name'])
+    # print(update.effective_message)
+    # print(update.effective_message.reply_to_message)
     context.bot.copy_message(chat_id=update.message.chat_id,
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.reply_to_message.message_id,
@@ -293,7 +293,7 @@ def rss_monitor(context):
                     print('\t- Pushing', entry['link'])
                     message_info=post.send(chatid, entry['summary'], rss_d.feed.title, entry['link'], context)
                     global groupId
-                    message_info=post.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
+                    post.send(groupId, entry['summary'], rss_d.feed.title, entry['link'], context)
                     
                     #context.bot.forward_message(groupId,message_info.chat.id,True,message_info.message_id)
                     print(message_info)
